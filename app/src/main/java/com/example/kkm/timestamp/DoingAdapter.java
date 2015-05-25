@@ -1,12 +1,12 @@
 package com.example.kkm.timestamp;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.kkm.timestamp.db.DoingContract;
 
@@ -30,14 +30,14 @@ public class DoingAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View rootView = ((Activity)context).getWindow().getDecorView().findViewById(android.R.id.content);
-        View view = rootView.findViewById(android.R.id.list);
+
+        View view = LayoutInflater.from(context).inflate(R.layout.views_for_list, parent, false);
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ListView lw = (ListView)view;
-        //lw.setAdapter(cursor);
+        TextView tv = (TextView)view.findViewById(R.id.itemTextView);
+        tv.setText(getDataFromCursor(cursor));
     }
 }
