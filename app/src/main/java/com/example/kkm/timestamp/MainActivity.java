@@ -5,15 +5,14 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.example.kkm.timestamp.db.DoingContract;
-
-import java.util.Date;
 
 
 public class MainActivity extends Activity {
@@ -43,6 +42,7 @@ public class MainActivity extends Activity {
         };
         doingButton.setOnClickListener(listener);
 
+
     }
 
     private void updateList() {
@@ -58,17 +58,25 @@ public class MainActivity extends Activity {
             );
         }catch (Exception e){e.printStackTrace();}
 
+        String[] from = new String[]{DoingContract.Columns.TIMESTAMP};
+        int[]  to = new int[] { R.id.itemTextView };
 
-        TextView tw=(TextView) findViewById(R.id.textview);
-        tw.setText("dates of doing\n");
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+                R.layout.views_for_list,
+                mDoingHistory, from, to);
+        //ListView lv = (ListView)findViewById(R.id.contactListView);
+        ListView listView = (ListView)findViewById(R.id.contactListView);
+        listView.setAdapter(adapter);
+        //TextView tw=(TextView) findViewById(R.id.textview);
+        //tw.setText("dates of doing\n");
 
         //ArrayList<String> list = new ArrayList<String>();
-        if (mDoingHistory.moveToFirst()){
+        /*if (mDoingHistory.moveToFirst()){
             do {
                 Date date =new Date(mDoingHistory.getInt(mDoingHistory.getColumnIndex(DoingContract.Columns.TIMESTAMP)));
-                tw.append("\n" + date.toString());
+                //tw.append("\n" + date.toString());
             }while (mDoingHistory.moveToNext());
-        }
+        }*/
         
     }
 
