@@ -1,10 +1,13 @@
 package com.example.kkm.timestamp;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,12 +17,13 @@ import android.widget.ListView;
 import com.example.kkm.timestamp.db.DoingContract;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     DoingAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -31,10 +35,10 @@ public class MainActivity extends Activity {
                 try {
                     ContentResolver contentResolver = getContentResolver();
 
-                    ContentValues con = new ContentValues();
+                    ContentValues mContentValues = new ContentValues();
                     contentResolver.insert(
                             DoingContract.Columns.CONTENT_URI,
-                            con
+                            mContentValues
                     );
                 }catch (Exception e){e.printStackTrace();}
 
@@ -47,44 +51,12 @@ public class MainActivity extends Activity {
     }
 
     private void updateList() {
-        Cursor mDoingHistory = null;
-        try {
-            ContentResolver contentResolver = getContentResolver();
-            mDoingHistory = contentResolver.query(
-                    DoingContract.Columns.CONTENT_URI,
-                    new String[]{DoingContract.Columns._ID,DoingContract.Columns.TIMESTAMP},
-                    null,
-                    null,
-                    null
-            );
-        }catch (Exception e){e.printStackTrace();}
 
-        /*String[] from = new String[]{DoingContract.Columns.TIMESTAMP};
-        int[]  to = new int[] { R.id.itemTextView };
-
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-                R.layout.views_for_list,
-                mDoingHistory, from, to);
-                */
-        //ListView lv = (ListView)findViewById(R.id.contactListView);
-
-        adapter = new DoingAdapter(getApplicationContext(), mDoingHistory, 0);
-
+        adapter = new DoingAdapter(getApplicationContext(), null, 0);
+        getSupportLoaderManager().restartLoader(0, null, this);
         ListView listView = (ListView)findViewById(R.id.contactListView);
         listView.setAdapter(adapter);
-        //TextView tw=(TextView) findViewById(R.id.textview);
-        //tw.setText("dates of doing\n");
 
-        //ArrayList<String> list = new ArrayList<String>();
-        /*
-        if (mDoingHistory.moveToFirst()){
-            do {
-                Date date =new Date(mDoingHistory.getInt(mDoingHistory.getColumnIndex(DoingContract.Columns.TIMESTAMP)));
-                //tw.append("\n" + date.toString());
-            }while (mDoingHistory.moveToNext());
-        }
-        */
-        
     }
 
     @Override
@@ -107,5 +79,27 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        return new CursorLoader(getApplicationContext(),
+                DoingContract.Columns.CONTENT_URI,
+                new String[]{DoingContract.Columns._ID,DoingContract.Columns.TIMESTAMP},
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
