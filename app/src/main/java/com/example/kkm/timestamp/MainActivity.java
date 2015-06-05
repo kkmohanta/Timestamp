@@ -15,11 +15,15 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.kkm.timestamp.db.DoingContract;
+import com.example.kkm.timestamp.db.DoingProvider;
+
+import java.util.Date;
 
 
 public class MainActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     DoingAdapter adapter;
+    Button doingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +31,9 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        doingButton = (Button)findViewById(R.id.button);
         updateList();
-        Button doingButton = (Button)findViewById(R.id.button);
+
         View.OnClickListener listener = new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -36,11 +41,16 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
                     ContentResolver contentResolver = getContentResolver();
 
                     ContentValues mContentValues = new ContentValues();
+                    mContentValues.clear();
+                    long time = new Date().getTime();
+                    mContentValues.put(DoingContract.Columns.TIMESTAMP, time);
                     contentResolver.insert(
                             DoingContract.Columns.CONTENT_URI,
                             mContentValues
                     );
-                }catch (Exception e){e.printStackTrace();}
+                }catch (Exception e){
+                    //Log.v("kkm-",e.toString());
+                }
 
                 updateList();
             }
@@ -56,7 +66,7 @@ public class MainActivity extends FragmentActivity implements LoaderManager.Load
         getSupportLoaderManager().restartLoader(0, null, this);
         ListView listView = (ListView)findViewById(R.id.contactListView);
         listView.setAdapter(adapter);
-
+        doingButton.setText("" + DoingProvider.getCursorSize());
     }
 
     @Override

@@ -23,8 +23,9 @@ public class DoingAdapter extends CursorAdapter {
     }
 
     private String getDataFromCursor(Cursor cursor){
-        Date date =new Date(cursor.getColumnIndex(DoingContract.Columns.TIMESTAMP));
-        SimpleDateFormat ft = new SimpleDateFormat("E, d M y  hh:mm a");
+        long time=cursor.getLong(cursor.getColumnIndex(DoingContract.Columns.TIMESTAMP));
+        Date date =new Date(time);
+        SimpleDateFormat ft = new SimpleDateFormat("E, d MMM y  hh:mm a");
         return ft.format(date);
     }
 

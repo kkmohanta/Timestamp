@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import java.util.Date;
-
 /**
  * Created by KKM on 5/21/2015.
  */
@@ -16,15 +14,10 @@ public class DoingProvider extends ContentProvider {
     private DoingDBHelper mOpenHelper;
     private SQLiteDatabase sqlDB;
 
-    private Cursor getAllData(){
+    public static int counter;
 
-        sqlDB = mOpenHelper.getReadableDatabase();
-
-        String selectQuery = "SELECT  * FROM " + DoingContract.TABLE;
-
-        Cursor cursor = sqlDB.rawQuery(selectQuery,null);
-        //sqlDB.close();-->this can led to hell if uncommented without pirior thinking.
-        return cursor;
+    public static int getCursorSize(){
+        return counter;
     }
 
     @Override
@@ -35,7 +28,18 @@ public class DoingProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return getAllData();
+        sqlDB = mOpenHelper.getReadableDatabase();
+
+        Cursor cursor = sqlDB.query(DoingContract.TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+        counter = cursor.getCount();
+        return cursor;
     }
 
     @Override
@@ -46,12 +50,8 @@ public class DoingProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         sqlDB = mOpenHelper.getWritableDatabase();
-
-        values.clear();
-
-        values.put(DoingContract.Columns.TIMESTAMP, new Date().getTime());
-
-        sqlDB.insertWithOnConflict(DoingContract.TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        sqlDB.insertWithOnConflict(DoingContract.TABLE,
+                null,  values, SQLiteDatabase.CONFLICT_IGNORE);
 
         return uri;
     }
